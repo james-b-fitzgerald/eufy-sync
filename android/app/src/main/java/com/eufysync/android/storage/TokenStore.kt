@@ -35,7 +35,7 @@ class TokenStore(context: Context) {
         get() = prefs.getString(KEY_GARMIN_EMAIL, null)
         set(v) = prefs.edit().putString(KEY_GARMIN_EMAIL, v).apply()
 
-    /** Stored only for the WebView pre-fill; never sent over the Python bridge. */
+    /** Garmin password — stored so it can be passed to the Python bridge for token refresh. */
     var garminPassword: String?
         get() = prefs.getString(KEY_GARMIN_PASSWORD, null)
         set(v) = prefs.edit().putString(KEY_GARMIN_PASSWORD, v).apply()

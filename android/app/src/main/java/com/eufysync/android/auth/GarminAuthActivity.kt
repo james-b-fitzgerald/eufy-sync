@@ -45,6 +45,18 @@ class GarminAuthActivity : AppCompatActivity() {
         private const val TAG = "GarminAuth"
 
         /**
+         * Mobile Chrome user-agent string — mirrors the one used by
+         * [garmin_auth.py][eufy_sync.garmin_auth] so the SSO page serves the
+         * same Android-optimised login experience.
+         *
+         * Update this when the target Chrome / Android version is bumped.
+         */
+        private const val GARMIN_WEBVIEW_USER_AGENT =
+            "Mozilla/5.0 (Linux; Android 13; sdk_gphone64_arm64) " +
+            "AppleWebKit/537.36 (KHTML, like Gecko) " +
+            "Chrome/121.0.0.0 Mobile Safari/537.36"
+
+        /**
          * Garmin mobile SSO URL — same as in garmin_auth.py [SSO_LOGIN_URL].
          * Opens the Android-styled Garmin login page.
          */
@@ -118,10 +130,7 @@ class GarminAuthActivity : AppCompatActivity() {
         webView.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
-            userAgentString =
-                "Mozilla/5.0 (Linux; Android 13; sdk_gphone64_arm64) " +
-                "AppleWebKit/537.36 (KHTML, like Gecko) " +
-                "Chrome/121.0.0.0 Mobile Safari/537.36"
+            userAgentString = GARMIN_WEBVIEW_USER_AGENT
         }
 
         // Register the JS interface before loading the URL
