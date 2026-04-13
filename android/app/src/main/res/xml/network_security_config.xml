@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Allow cleartext traffic only to localhost (used during local testing).
+  All actual API calls (Eufy, Garmin, Strava) use HTTPS.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+</network-security-config>

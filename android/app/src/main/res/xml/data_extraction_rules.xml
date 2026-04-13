@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Never back up token files or the sync database -->
+        <exclude domain="file" path=".garmin-sync/" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path=".garmin-sync/" />
+    </device-transfer>
+</data-extraction-rules>

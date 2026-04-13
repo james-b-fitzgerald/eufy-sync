@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- ── Step 1: Eufy credentials ─────────────────────────────── -->
+        <TextView
+            android:id="@+id/headerEufy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/setup_eufy_header"
+            android:textAppearance="?attr/textAppearanceHeadline6"
+            android:paddingBottom="8dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_eufy_email"
+            android:layout_marginBottom="8dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editEufyEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_eufy_password"
+            app:passwordToggleEnabled="true"
+            android:layout_marginBottom="16dp"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editEufyPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- ── Step 2: Target selection ──────────────────────────────── -->
+        <TextView
+            android:id="@+id/headerTargets"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/setup_targets_header"
+            android:textAppearance="?attr/textAppearanceHeadline6"
+            android:paddingBottom="8dp" />
+
+        <CheckBox
+            android:id="@+id/checkGarmin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/label_sync_garmin"
+            android:checked="true" />
+
+        <CheckBox
+            android:id="@+id/checkStrava"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/label_sync_strava"
+            android:paddingBottom="16dp" />
+
+        <!-- ── Step 3: Garmin credentials ────────────────────────────── -->
+        <LinearLayout
+            android:id="@+id/sectionGarmin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/setup_garmin_header"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:paddingBottom="8dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_garmin_email"
+                android:layout_marginBottom="8dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editGarminEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_garmin_password"
+                app:passwordToggleEnabled="true"
+                android:layout_marginBottom="8dp"
+                xmlns:app="http://schemas.android.com/apk/res-auto">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editGarminPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGarminLogin"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_garmin_login"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/textGarminAuthStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:paddingBottom="16dp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- ── Step 4: Strava API app credentials ────────────────────── -->
+        <LinearLayout
+            android:id="@+id/sectionStrava"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/setup_strava_header"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:paddingBottom="8dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_strava_client_id"
+                android:layout_marginBottom="8dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editStravaClientId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_strava_client_secret"
+                app:passwordToggleEnabled="true"
+                android:layout_marginBottom="8dp"
+                xmlns:app="http://schemas.android.com/apk/res-auto">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editStravaClientSecret"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStravaAuthorize"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_strava_authorize"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/textStravaAuthStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:paddingBottom="16dp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- ── Finish ─────────────────────────────────────────────────── -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFinish"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_finish" />
+
+    </LinearLayout>
+</ScrollView>
