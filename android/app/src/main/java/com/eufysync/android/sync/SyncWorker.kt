@@ -6,11 +6,11 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkConstraints
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.chaquo.python.Python
@@ -47,7 +47,7 @@ class SyncWorker(context: Context, params: WorkerParameters) :
 
         /** Enqueue a once-per-day periodic work request (survives reboots). */
         fun schedule(context: Context) {
-            val constraints = WorkConstraints.Builder()
+            val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
 

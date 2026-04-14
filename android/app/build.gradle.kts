@@ -25,22 +25,6 @@ android {
             abiFilters += listOf("arm64-v8a", "x86_64")
         }
 
-        python {
-            version = "3.12"
-            pip {
-                // Runtime deps of eufy_sync (playwright + keyring are NOT needed on Android)
-                install("httpx>=0.27.0")
-                install("pyyaml>=6.0")
-            }
-        }
-    }
-
-    // Make the eufy_sync Python package (at the repo root) visible to Chaquopy.
-    // rootProject.projectDir = android/  →  ../ = repo root where eufy_sync/ lives.
-    sourceSets {
-        getByName("main") {
-            python.srcDirs(rootProject.projectDir.parent)
-        }
     }
 
     buildTypes {
@@ -64,6 +48,26 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
+    }
+}
+
+chaquopy {
+    defaultConfig {
+        version = "3.12"
+        pip {
+            // Runtime deps of eufy_sync (playwright + keyring are NOT needed on Android)
+            install("httpx>=0.27.0")
+            install("pyyaml>=6.0")
+        }
+    }
+
+    // Make only the eufy_sync Python package visible to Chaquopy.
+    // Pointing at the whole repo can include Android build outputs and trigger
+    // Gradle task validation errors about implicit dependencies.
+    sourceSets {
+        getByName("main") {
+            srcDir("${rootProject.projectDir.parent}/eufy_sync")
+        }
     }
 }
 
