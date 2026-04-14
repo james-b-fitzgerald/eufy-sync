@@ -11,7 +11,10 @@ ENV PATH=${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platfo
 # cmdline-tools 13.0  (stable, widely used in CI)
 ARG CMDTOOLS_URL="https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
 
-RUN apt-get update -qq \
+# The base image may include a Yarn apt source with a missing/rotated GPG key.
+# Remove it so apt-get update remains deterministic for this image build.
+RUN rm -f /etc/apt/sources.list.d/yarn.list /etc/apt/sources.list.d/yarn.list.save \
+    && apt-get update -qq \
     && apt-get install -y --no-install-recommends wget unzip \
     && rm -rf /var/lib/apt/lists/* \
     # Download and install cmdline-tools
