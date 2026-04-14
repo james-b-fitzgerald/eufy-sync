@@ -17,10 +17,10 @@ import com.chaquo.python.Python
 import com.eufysync.android.ParseUtils
 import com.eufysync.android.R
 import com.eufysync.android.databinding.ActivityGarminAuthBinding
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.lifecycle.lifecycleScope
 
 /**
  * WebView-based Garmin SSO login activity.
@@ -37,7 +37,6 @@ import kotlinx.coroutines.withContext
 class GarminAuthActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityGarminAuthBinding
-    private val scope = CoroutineScope(Dispatchers.Main)
 
     /** EXTRA key for the Garmin data-directory path passed in from [SetupActivity]. */
     companion object {
@@ -153,8 +152,12 @@ class GarminAuthActivity : AppCompatActivity() {
             }
 
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-                // Stay within the WebView for all Garmin SSO pages
-                return false
+                // Only allow navigation within Garmin SSO domains.
+                // Block non-Garmin or plaintext URLs to reduce the JS-interface attack surface.
+                val host = request.url.host ?: return true
+                val isGarminHost = host.endsWith("garmin.com") || host.endsWith("garmin.cn")
+                val isHttps = request.url.scheme?.lowercase() == "https"
+                return !(isGarminHost && isHttps)
             }
         }
 
@@ -179,7 +182,7 @@ class GarminAuthActivity : AppCompatActivity() {
             }
 
             Log.i(TAG, "Service ticket captured; exchanging for OAuth2 tokens via Python bridge")
-            scope.launch {
+            lifecycleScope.launch {
                 exchangeTicket(ticket, dataDir)
             }
         }

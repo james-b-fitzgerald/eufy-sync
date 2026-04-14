@@ -44,8 +44,14 @@ _DATA_DIR: Path | None = None
 def set_data_dir(path: str) -> None:
     """Configure the directory used for all token / session / database files.
 
-    Must be called before any other function in this module.
-    The Kotlin Application class calls this with ``context.filesDir + "/.garmin-sync"``.
+    The Kotlin Application class calls this once at startup with
+    ``context.filesDir + "/.garmin-sync"``.
+
+    Calling this explicitly is only required when you need to set the directory
+    globally for all subsequent calls.  :func:`run_sync` and
+    :func:`get_token_status` both accept a ``data_dir`` argument and will call
+    this internally — passing ``data_dir`` directly to those functions is
+    sufficient and preferred.
     """
     global _DATA_DIR
     _DATA_DIR = Path(path)
@@ -169,6 +175,13 @@ def run_sync(
     if data_dir is not None:
         set_data_dir(data_dir)
 
+    # The sync engine (garmin_auth, strava_client, etc.) resolves token files
+    # relative to Path.home() / ".garmin-sync".  Align HOME with the configured
+    # data directory's parent so that all modules write to the same location
+    # regardless of whether they use _data_dir() or Path.home() directly.
+    active_dir = _data_dir()
+    os.environ["HOME"] = str(active_dir.parent)
+
     from eufy_sync.config import EufyConfig, GarminConfig, StravaConfig, UserConfig
     from eufy_sync.state import SyncState
     from eufy_sync.sync import sync_user
@@ -189,6 +202,7 @@ def run_sync(
     )
 
     db_path = _data_dir() / "state.db"
+    db_path.parent.mkdir(parents=True, exist_ok=True)
     state = SyncState(db_path)
     try:
         counts = sync_user(
@@ -234,7 +248,10 @@ def get_token_status(data_dir: str | None = None) -> str:
         from eufy_sync.strava_client import StravaClient
         from eufy_sync.config import StravaConfig
         client = StravaClient(StravaConfig("", ""))
-        status["strava"] = client.token_status()
+        try:
+            status["strava"] = client.token_status()
+        finally:
+            client.close()
     except Exception as exc:
         status["strava"] = {"state": "error", "error": str(exc)}
 

@@ -9,10 +9,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.chaquo.python.Python
 import com.eufysync.android.ParseUtils
 import com.eufysync.android.storage.TokenStore
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.lifecycle.lifecycleScope
 
 /**
  * Transparent trampoline activity that handles the Strava OAuth callback URI.
@@ -35,10 +35,7 @@ class StravaCallbackActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "StravaCallback"
-        const val EXTRA_DATA_DIR = "data_dir"
     }
-
-    private val scope = CoroutineScope(Dispatchers.Main)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,7 +74,7 @@ class StravaCallbackActivity : AppCompatActivity() {
         val clientSecret = store.stravaClientSecret ?: return failWith("Strava clientSecret missing")
         val dataDir      = "${filesDir.absolutePath}/.garmin-sync"
 
-        scope.launch {
+        lifecycleScope.launch {
             exchangeCode(clientId, clientSecret, code, dataDir, store)
         }
     }
