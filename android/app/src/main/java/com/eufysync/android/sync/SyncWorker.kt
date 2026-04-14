@@ -86,8 +86,8 @@ class SyncWorker(context: Context, params: WorkerParameters) :
         val eufyEmail    = store.eufyEmail    ?: return failMissing("Eufy email")
         val eufyPassword = store.eufyPassword ?: return failMissing("Eufy password")
 
-        val garminEmail    = if (store.syncGarmin) store.garminEmail    else null
-        val garminPassword = if (store.syncGarmin) store.garminPassword else null
+        val garminEmail = if (store.syncGarmin) store.garminEmail else null
+        // garmin_password is no longer stored; headless token refresh uses session.json
         val stravaClientId     = if (store.syncStrava) store.stravaClientId     else null
         val stravaClientSecret = if (store.syncStrava) store.stravaClientSecret else null
 
@@ -104,7 +104,7 @@ class SyncWorker(context: Context, params: WorkerParameters) :
                 eufyEmail,
                 eufyPassword,
                 garminEmail,
-                garminPassword,
+                null,   // garmin_password: not stored; headless refresh uses session.json
                 stravaClientId,
                 stravaClientSecret,
                 dataDir,

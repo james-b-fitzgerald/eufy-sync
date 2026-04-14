@@ -52,13 +52,13 @@ class SetupActivity : AppCompatActivity() {
         if (result.resultCode == Activity.RESULT_OK) {
             store.garminAuthed = true
             binding.textGarminAuthStatus.apply {
-                text = "✓ Garmin authenticated"
+                text = getString(R.string.garmin_auth_success)
                 visibility = View.VISIBLE
             }
             Log.i(TAG, "Garmin authentication succeeded")
         } else {
             binding.textGarminAuthStatus.apply {
-                text = "✗ Garmin authentication failed — try again"
+                text = getString(R.string.garmin_auth_failed)
                 visibility = View.VISIBLE
             }
             Log.w(TAG, "Garmin authentication failed/cancelled")
@@ -101,17 +101,16 @@ class SetupActivity : AppCompatActivity() {
     // ── Garmin ────────────────────────────────────────────────────────────────
 
     private fun launchGarminAuth() {
-        val email    = binding.editGarminEmail.text?.toString()?.trim()
-        val password = binding.editGarminPassword.text?.toString()
+        val email = binding.editGarminEmail.text?.toString()?.trim()
 
-        if (email.isNullOrBlank() || password.isNullOrBlank()) {
-            Toast.makeText(this, "Enter your Garmin email and password first", Toast.LENGTH_SHORT).show()
+        // The user authenticates directly in the Garmin WebView — only the email
+        // address (used as a display hint) is needed here; no password is stored.
+        if (email.isNullOrBlank()) {
+            Toast.makeText(this, getString(R.string.toast_garmin_email_required), Toast.LENGTH_SHORT).show()
             return
         }
 
-        // Persist credentials before opening WebView so we can pre-fill if needed
-        store.garminEmail    = email
-        store.garminPassword = password
+        store.garminEmail = email
 
         val dataDir = "${filesDir.absolutePath}/.garmin-sync"
         val intent = Intent(this, GarminAuthActivity::class.java).apply {
@@ -127,7 +126,7 @@ class SetupActivity : AppCompatActivity() {
         val clientSecret = binding.editStravaClientSecret.text?.toString()?.trim()
 
         if (clientId.isNullOrBlank() || clientSecret.isNullOrBlank()) {
-            Toast.makeText(this, "Enter your Strava Client ID and Secret first", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_strava_creds_required), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -167,19 +166,19 @@ class SetupActivity : AppCompatActivity() {
         val strava  = binding.checkStrava.isChecked
 
         if (eufy.isNullOrBlank() || eufyPw.isNullOrBlank()) {
-            Toast.makeText(this, "Eufy email and password are required", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_eufy_required), Toast.LENGTH_SHORT).show()
             return
         }
         if (!garmin && !strava) {
-            Toast.makeText(this, "Select at least one sync target", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_select_target), Toast.LENGTH_SHORT).show()
             return
         }
         if (garmin && !store.garminAuthed) {
-            Toast.makeText(this, "Complete Garmin authentication first", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_garmin_auth_first), Toast.LENGTH_SHORT).show()
             return
         }
         if (strava && !store.stravaAuthed) {
-            Toast.makeText(this, "Complete Strava authorization first", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_strava_auth_first), Toast.LENGTH_SHORT).show()
             return
         }
 

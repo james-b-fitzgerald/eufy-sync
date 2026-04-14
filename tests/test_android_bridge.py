@@ -350,9 +350,11 @@ class TestRunSync(unittest.TestCase):
         bridge = _import_bridge()
         with tempfile.TemporaryDirectory() as tmp:
             with patch("eufy_sync.sync.sync_user", return_value={}):
-                bridge.run_sync("e@e.com", "pw", "g@g.com", "gpw", None, None, data_dir=tmp)
+                bridge.run_sync("e@e.com", "pw", "g@g.com", None, None, None, data_dir=tmp)
 
-            self.assertEqual(bridge._DATA_DIR, Path(tmp))
+            # run_sync normalises the data_dir to always end with ".garmin-sync"
+            # so that HOME = data_dir.parent aligns Path.home()/".garmin-sync" with _DATA_DIR.
+            self.assertEqual(bridge._DATA_DIR, Path(tmp) / ".garmin-sync")
 
     def test_state_db_is_closed_even_on_failure(self):
         """SyncState.close() must be called even when sync raises."""

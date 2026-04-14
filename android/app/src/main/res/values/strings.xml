@@ -13,8 +13,9 @@
     <string name="label_sync_strava">Sync to Strava</string>
     <string name="setup_garmin_header">Garmin Account</string>
     <string name="hint_garmin_email">Garmin email</string>
-    <string name="hint_garmin_password">Garmin password</string>
     <string name="btn_garmin_login">Open Garmin Login</string>
+    <string name="garmin_auth_success">✓ Garmin authenticated</string>
+    <string name="garmin_auth_failed">✗ Garmin authentication failed — try again</string>
     <string name="setup_strava_header">Strava API App</string>
     <string name="hint_strava_client_id">Client ID</string>
     <string name="hint_strava_client_secret">Client Secret</string>
@@ -22,6 +23,13 @@
     <string name="btn_next">Next</string>
     <string name="btn_finish">Finish Setup</string>
     <string name="setup_complete">Setup complete! Your scale data will sync to %1$s daily.</string>
+    <!-- Setup validation toasts -->
+    <string name="toast_garmin_email_required">Enter your Garmin email first</string>
+    <string name="toast_strava_creds_required">Enter your Strava Client ID and Secret first</string>
+    <string name="toast_eufy_required">Eufy email and password are required</string>
+    <string name="toast_select_target">Select at least one sync target</string>
+    <string name="toast_garmin_auth_first">Complete Garmin authentication first</string>
+    <string name="toast_strava_auth_first">Complete Strava authorization first</string>
 
     <!-- Main / status screen -->
     <string name="status_last_sync">Last sync: %1$s</string>

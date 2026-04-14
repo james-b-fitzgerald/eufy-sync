@@ -155,10 +155,10 @@ def exchange_strava_code(client_id: str, client_secret: str, code: str) -> dict:
 def run_sync(
     eufy_email: str,
     eufy_password: str,
-    garmin_email: str | None,
-    garmin_password: str | None,
-    strava_client_id: str | None,
-    strava_client_secret: str | None,
+    garmin_email: str | None = None,
+    garmin_password: str | None = None,
+    strava_client_id: str | None = None,
+    strava_client_secret: str | None = None,
     data_dir: str | None = None,
     backfill_days: int | None = None,
 ) -> str:
@@ -168,6 +168,11 @@ def run_sync(
     ``sync.sync_user()`` with ``headless=True`` (no browser — tokens must already
     exist from the one-time setup flow).
 
+    ``garmin_password`` is optional and never used on Android: the headless
+    refresh path reads the saved refresh token from ``session.json``.  If the
+    refresh token is also expired, ``sync_user`` raises and the worker notifies
+    the user to re-authenticate via the WebView flow.
+
     Returns JSON:
       ``{"success": true,  "counts": {"garmin": N, "strava": N}}``
       ``{"success": false, "error":  "...message..."}``
@@ -176,10 +181,14 @@ def run_sync(
         set_data_dir(data_dir)
 
     # The sync engine (garmin_auth, strava_client, etc.) resolves token files
-    # relative to Path.home() / ".garmin-sync".  Align HOME with the configured
-    # data directory's parent so that all modules write to the same location
-    # regardless of whether they use _data_dir() or Path.home() directly.
+    # relative to Path.home() / ".garmin-sync".  Normalise the active data dir
+    # to always end with ".garmin-sync" so that setting HOME = its parent makes
+    # Path.home() / ".garmin-sync" resolve to the same directory regardless of
+    # what the caller passed.
     active_dir = _data_dir()
+    if active_dir.name != ".garmin-sync":
+        active_dir = active_dir / ".garmin-sync"
+        set_data_dir(str(active_dir))   # creates the directory and updates _DATA_DIR
     os.environ["HOME"] = str(active_dir.parent)
 
     from eufy_sync.config import EufyConfig, GarminConfig, StravaConfig, UserConfig
@@ -190,8 +199,11 @@ def run_sync(
         name="android_user",
         eufy=EufyConfig(email=eufy_email, password=eufy_password),
         garmin=(
-            GarminConfig(email=garmin_email, password=garmin_password)
-            if garmin_email and garmin_password
+            # password is not required for headless refresh (session.json is used);
+            # pass an empty string so GarminConfig is always constructed when an
+            # email is present, allowing token refresh to proceed.
+            GarminConfig(email=garmin_email, password=garmin_password or "")
+            if garmin_email
             else None
         ),
         strava=(

@@ -35,11 +35,6 @@ class TokenStore(context: Context) {
         get() = prefs.getString(KEY_GARMIN_EMAIL, null)
         set(v) = prefs.edit().putString(KEY_GARMIN_EMAIL, v).apply()
 
-    /** Garmin password — stored so it can be passed to the Python bridge for token refresh. */
-    var garminPassword: String?
-        get() = prefs.getString(KEY_GARMIN_PASSWORD, null)
-        set(v) = prefs.edit().putString(KEY_GARMIN_PASSWORD, v).apply()
-
     /** True once GarminAuthActivity has successfully exchanged the service ticket. */
     var garminAuthed: Boolean
         get() = prefs.getBoolean(KEY_GARMIN_AUTHED, false)
@@ -111,7 +106,6 @@ class TokenStore(context: Context) {
         const val KEY_EUFY_EMAIL       = "eufy_email"
         const val KEY_EUFY_PASSWORD    = "eufy_password"
         const val KEY_GARMIN_EMAIL     = "garmin_email"
-        const val KEY_GARMIN_PASSWORD  = "garmin_password"
         const val KEY_GARMIN_AUTHED    = "garmin_authed"
         const val KEY_STRAVA_CLIENT_ID     = "strava_client_id"
         const val KEY_STRAVA_CLIENT_SECRET = "strava_client_secret"
