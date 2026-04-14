@@ -12,3 +12,5 @@ venv/
 *.egg-info/
 *.plist
 CLAUDE.md
+android/.gradle
+android/app/build/
