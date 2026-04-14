@@ -45,17 +45,10 @@ android_bridge.run_sync()          ← eufy_sync/android_bridge.py
 
 ## Build
 
-The Gradle wrapper JAR (`gradle/wrapper/gradle-wrapper.jar`) is not committed.
-Generate it once before the first build:
+Build the debug APK with the Gradle wrapper from this repo:
 
 ```bash
 cd android/
-gradle wrapper --gradle-version 8.6
-```
-
-Then build the debug APK:
-
-```bash
 ./gradlew assembleDebug
 ```
 
