@@ -12,7 +12,6 @@
 set -euo pipefail
 
 ANDROID_HOME="${ANDROID_HOME:-/opt/android-sdk}"
-GRADLE_VERSION="8.6"
 
 echo "──────────────────────────────────────────────────────────────────────────"
 echo "  eufy-sync Android – post-create setup"
@@ -54,18 +53,20 @@ else
     echo "  For emulator support, open this Codespace on a 4-core (or larger) machine."
 fi
 
-# ── 4. Gradle wrapper ─────────────────────────────────────────────────────────
-# The wrapper JAR is intentionally not committed; bootstrap it once here.
-echo "[4/5] Generating Gradle ${GRADLE_VERSION} wrapper..."
-GRADLE_DIST="gradle-${GRADLE_VERSION}-bin.zip"
-wget -q "https://services.gradle.org/distributions/${GRADLE_DIST}" \
-     -O "/tmp/${GRADLE_DIST}"
-unzip -q "/tmp/${GRADLE_DIST}" -d /tmp/gradle_extract
-export PATH="/tmp/gradle-${GRADLE_VERSION}/bin:${PATH}"
+# ── 4. Gradle wrapper validation ──────────────────────────────────────────────
+# Wrapper files are committed, so just ensure they are executable/present.
+echo "[4/5] Validating committed Gradle wrapper..."
+if [ ! -f "android/gradlew" ]; then
+    echo "  ERROR: android/gradlew is missing."
+    exit 1
+fi
+chmod +x "android/gradlew"
 
-(cd android && gradle wrapper --gradle-version "${GRADLE_VERSION}")
-rm -rf "/tmp/${GRADLE_DIST}" /tmp/gradle_extract
-echo "  Gradle wrapper written to android/gradle/wrapper/."
+if [ ! -f "android/gradle/wrapper/gradle-wrapper.properties" ]; then
+    echo "  ERROR: android/gradle/wrapper/gradle-wrapper.properties is missing."
+    exit 1
+fi
+echo "  Using committed wrapper in android/."
 
 # ── 5. Python dependencies ────────────────────────────────────────────────────
 echo "[5/5] Installing Python dependencies..."
