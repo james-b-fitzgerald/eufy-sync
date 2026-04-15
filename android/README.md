@@ -40,8 +40,7 @@ android_bridge.run_sync()          ← eufy_sync/android_bridge.py
 
 - Android Studio Hedgehog or newer
 - Android SDK 34 + NDK (for Chaquopy native libs)
-- `arm64-v8a` device or emulator (or add `x86_64` to `abiFilters` in
-  `app/build.gradle.kts` for emulators)
+- `arm64-v8a` device or `x86_64` emulator
 
 ## Build
 
