@@ -75,9 +75,10 @@ python -m pytest tests/test_android_bridge.py -v
 1. Open the app → Setup wizard opens automatically.
 2. Enter Eufy email + password.
 3. Select targets (Garmin, Strava, or both).
-4. **Garmin**: enter Garmin email + password → tap *Open Garmin Login* → a
-   WebView loads the Garmin SSO page; log in normally; the app intercepts the
-   service ticket and exchanges it for OAuth2 tokens automatically.
+4. **Garmin**: enter Garmin email → tap *Open Garmin Login* → a WebView
+   loads the Garmin SSO page; log in there with your Garmin credentials; the
+   app intercepts the service ticket and exchanges it for OAuth2 tokens
+   automatically.
 5. **Strava**: enter your Strava API app's Client ID and Secret → tap
    *Authorize Strava* → Chrome opens; grant access; the app handles the
    `eufysync://strava/callback` redirect.
