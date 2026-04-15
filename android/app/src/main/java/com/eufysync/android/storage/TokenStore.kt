@@ -95,7 +95,7 @@ class TokenStore(context: Context) {
     /** Returns true if the minimum credentials required to run a sync are present. */
     fun hasMinimumCredentials(): Boolean {
         if (eufyEmail.isNullOrBlank() || eufyPassword.isNullOrBlank()) return false
-        if (syncGarmin && !garminAuthed) return false
+        if (syncGarmin && (!garminAuthed || garminEmail.isNullOrBlank())) return false
         if (syncStrava && !stravaAuthed) return false
         return syncGarmin || syncStrava
     }
