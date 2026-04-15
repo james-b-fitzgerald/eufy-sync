@@ -208,6 +208,14 @@ class ParseUtilsTest {
         assertEquals("a=b=c", result["token"])
     }
 
+    @Test
+    fun `parseQueryString - percent-decodes keys and values`() {
+        // code value contains a '+' and a percent-encoded slash
+        val result = ParseUtils.parseQueryString("code=hello%2Fworld&state=my+state")
+        assertEquals("hello/world", result["code"])
+        assertEquals("my state", result["state"])
+    }
+
     // =========================================================================
     // extractStravaCode
     // =========================================================================

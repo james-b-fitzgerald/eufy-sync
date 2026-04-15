@@ -4,6 +4,8 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import java.net.URI
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 /**
  * Pure-Kotlin helpers for parsing results that cross the Chaquopy boundary.
@@ -111,8 +113,8 @@ object ParseUtils {
 
     /**
      * Split a URL query string (no leading `?`) into a key→value map.
-     * Duplicate keys retain the last value.  Values are NOT URL-decoded beyond
-     * what `URI` already handles.
+     * Duplicate keys retain the last value.  Both keys and values are
+     * percent-decoded using UTF-8 via [URLDecoder].
      */
     fun parseQueryString(query: String): Map<String, String> {
         if (query.isBlank()) return emptyMap()
@@ -120,7 +122,11 @@ object ParseUtils {
             .mapNotNull { pair ->
                 val idx = pair.indexOf('=')
                 if (idx < 1) null
-                else pair.substring(0, idx) to pair.substring(idx + 1)
+                else {
+                    val key = URLDecoder.decode(pair.substring(0, idx), StandardCharsets.UTF_8.name())
+                    val value = URLDecoder.decode(pair.substring(idx + 1), StandardCharsets.UTF_8.name())
+                    key to value
+                }
             }
             .toMap()
     }
