@@ -247,6 +247,15 @@ def get_token_status(data_dir: str | None = None) -> str:
     if data_dir is not None:
         set_data_dir(data_dir)
 
+    # Align HOME with the data directory so that any module that resolves token
+    # paths via Path.home() / ".garmin-sync" reads from the same location as
+    # the bridge (same normalization logic as run_sync).
+    active_dir = _data_dir()
+    if active_dir.name != ".garmin-sync":
+        active_dir = active_dir / ".garmin-sync"
+        set_data_dir(str(active_dir))
+    os.environ["HOME"] = str(active_dir.parent)
+
     status: dict = {}
 
     try:

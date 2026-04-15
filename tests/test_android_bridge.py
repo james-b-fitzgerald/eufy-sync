@@ -462,7 +462,9 @@ class TestGetTokenStatus(unittest.TestCase):
                  patch("eufy_sync.strava_client.StravaClient.token_status", return_value=strava_status):
                 bridge.get_token_status(data_dir=tmp)
 
-            self.assertEqual(bridge._DATA_DIR, Path(tmp))
+            # get_token_status normalises data_dir to end with ".garmin-sync"
+            # (same contract as run_sync) so HOME = data_dir.parent is always correct.
+            self.assertEqual(bridge._DATA_DIR, Path(tmp) / ".garmin-sync")
 
 
 if __name__ == "__main__":
