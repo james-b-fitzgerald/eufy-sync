@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Eufy Sync</string>
+    <string name="title_setup">Setup</string>
+    <string name="title_garmin_auth">Sign in to Garmin</string>
+
+    <!-- Setup wizard -->
+    <string name="setup_eufy_header">Eufy Account</string>
+    <string name="hint_eufy_email">Eufy email</string>
+    <string name="hint_eufy_password">Eufy password</string>
+    <string name="setup_targets_header">Sync Targets</string>
+    <string name="label_sync_garmin">Sync to Garmin Connect</string>
+    <string name="label_sync_strava">Sync to Strava</string>
+    <string name="setup_garmin_header">Garmin Account</string>
+    <string name="hint_garmin_email">Garmin email</string>
+    <string name="btn_garmin_login">Open Garmin Login</string>
+    <string name="garmin_auth_success">✓ Garmin authenticated</string>
+    <string name="garmin_auth_failed">✗ Garmin authentication failed — try again</string>
+    <string name="setup_strava_header">Strava API App</string>
+    <string name="hint_strava_client_id">Client ID</string>
+    <string name="hint_strava_client_secret">Client Secret</string>
+    <string name="btn_strava_authorize">Authorize Strava</string>
+    <string name="btn_next">Next</string>
+    <string name="btn_finish">Finish Setup</string>
+    <string name="setup_complete">Setup complete! Your scale data will sync to %1$s daily.</string>
+    <!-- Setup validation toasts -->
+    <string name="toast_garmin_email_required">Enter your Garmin email first</string>
+    <string name="toast_strava_creds_required">Enter your Strava Client ID and Secret first</string>
+    <string name="toast_eufy_required">Eufy email and password are required</string>
+    <string name="toast_select_target">Select at least one sync target</string>
+    <string name="toast_garmin_auth_first">Complete Garmin authentication first</string>
+    <string name="toast_strava_auth_first">Complete Strava authorization first</string>
+
+    <!-- Main / status screen -->
+    <string name="status_last_sync">Last sync: %1$s</string>
+    <string name="status_never_synced">Not yet synced</string>
+    <string name="status_garmin_token">Garmin token: %1$s</string>
+    <string name="status_strava_token">Strava token: %1$s</string>
+    <string name="btn_sync_now">Sync Now</string>
+    <string name="btn_setup">Configure</string>
+    <string name="label_auto_sync">Auto-sync daily</string>
+    <string name="syncing">Syncing…</string>
+    <string name="sync_success">Synced %1$d measurement(s)</string>
+    <string name="sync_failed">Sync failed — tap Configure to re-authenticate</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_id">eufy_sync</string>
+    <string name="notif_channel_name">Sync status</string>
+    <string name="notif_title_success">Eufy Sync</string>
+    <string name="notif_title_failure">Eufy Sync failed</string>
+    <string name="notif_body_success">Synced %1$d measurement(s) → %2$s</string>
+    <string name="notif_body_failure">%1$s\nOpen the app to re-authenticate.</string>
+
+    <!-- Token states -->
+    <string name="token_valid">valid (%1$d days)</string>
+    <string name="token_refresh_needed">refreshing…</string>
+    <string name="token_expired">expired — tap Configure</string>
+    <string name="token_no_session">not configured</string>
+    <string name="token_error">error</string>
+</resources>

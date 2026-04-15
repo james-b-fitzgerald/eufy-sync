@@ -1,0 +1,41 @@
+{
+  "name": "eufy-sync Android",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+
+  // Install Python 3.12 alongside the Java base image
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.12"
+    }
+  },
+
+  // Expose ANDROID_HOME and emulator binaries to all shells opened in the Codespace
+  "remoteEnv": {
+    "ANDROID_HOME": "/opt/android-sdk",
+    "PATH": "${containerEnv:PATH}:/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools:/opt/android-sdk/emulator"
+  },
+
+  // Run after the container is created to install SDK packages, bootstrap Gradle,
+  // and (when KVM is available) create a ready-to-launch Android emulator AVD
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // Kotlin syntax + navigation
+        "mathiasfrohlich.Kotlin",
+        // Gradle tasks panel
+        "vscjava.vscode-gradle",
+        // Python tests and IntelliSense
+        "ms-python.python",
+        "ms-python.vscode-pylance"
+      ],
+      "settings": {
+        "java.jdt.ls.java.home": "/usr/local/sdkman/candidates/java/current",
+        "python.defaultInterpreterPath": "/usr/local/python/current/bin/python"
+      }
+    }
+  }
+}

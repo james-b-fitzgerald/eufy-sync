@@ -114,8 +114,14 @@ On systems without keychain support (headless Linux), credentials fall back to f
 
 ## Tests
 
+From a source checkout, install dependencies first:
+
 ```bash
-pytest tests/ -v
+python -m pip install -r requirements.txt
+```
+
+```bash
+python -m pytest tests/ -v
 ```
 
 ## Disclaimer
