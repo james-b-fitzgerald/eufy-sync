@@ -161,7 +161,7 @@ class MainActivity : AppCompatActivity() {
                         store.eufyEmail,
                         store.eufyPassword,
                         if (store.syncGarmin) store.garminEmail else null,
-                        if (store.syncGarmin) store.garminPassword else null,
+                        null,
                         if (store.syncStrava) store.stravaClientId else null,
                         if (store.syncStrava) store.stravaClientSecret else null,
                         dataDir,
