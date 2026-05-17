@@ -3,6 +3,8 @@ from __future__ import annotations
 import time
 from unittest.mock import patch, MagicMock
 
+from playwright.sync_api import Error as PlaywrightError
+
 from eufy_sync.garmin_auth import (
     GarminAuth,
     GarminSession,
@@ -86,7 +88,7 @@ def test_browser_context_options_non_windows():
 
 def test_launch_browser_windows_edge_first_fallback_to_chromium():
     playwright = MagicMock()
-    playwright.chromium.launch.side_effect = [RuntimeError("no edge"), "fallback-browser"]
+    playwright.chromium.launch.side_effect = [PlaywrightError("no edge"), "fallback-browser"]
     with patch("eufy_sync.garmin_auth.platform.system", return_value="Windows"):
         browser = _launch_browser(playwright)
     assert browser == "fallback-browser"

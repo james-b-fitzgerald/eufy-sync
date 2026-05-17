@@ -56,9 +56,10 @@ REFRESH_SAFETY_MARGIN = 300  # seconds before expiry to trigger refresh
 def _launch_browser(playwright):
     """Launch browser with Windows fallback for Cloudflare-sensitive SSO flows."""
     if platform.system() == "Windows":
+        from playwright.sync_api import Error as PlaywrightError
         try:
             return playwright.chromium.launch(headless=False, channel="msedge")
-        except Exception:
+        except PlaywrightError:
             logger.info("Failed to launch Edge channel, falling back to bundled Chromium")
     return playwright.chromium.launch(headless=False)
 
