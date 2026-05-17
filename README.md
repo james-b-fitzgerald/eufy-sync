@@ -47,6 +47,18 @@ pipx install eufy-sync
 eufy-sync
 ```
 
+Install from a local wheel (`.whl`) instead:
+
+### macOS (local `.whl`)
+```bash
+pipx install /absolute/path/to/eufy_sync-<version>-py3-none-any.whl
+```
+
+### Windows (local `.whl`)
+```powershell
+pipx install "C:\absolute\path\to\eufy_sync-<version>-py3-none-any.whl"
+```
+
 Setup is guided on first run - choose your sync targets (Garmin, Strava, or both), enter your credentials, and your data syncs automatically.
 
 > **Note:** If you've cloned this repo, run pipx commands from outside the repo directory to avoid path conflicts (e.g., `cd /tmp && pipx install eufy-sync`).
