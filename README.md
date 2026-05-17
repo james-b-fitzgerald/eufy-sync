@@ -7,7 +7,7 @@
 
 Syncs body composition data from a Eufy smart scale to Garmin Connect and/or Strava. Weight, body fat %, muscle mass, bone mass, hydration, BMR, visceral fat, and metabolic age all come through to Garmin. Strava gets weight updates.
 
-> macOS only. Requires Python 3.12+ and a terminal. Setup is guided - you just answer a few prompts.
+> Supports macOS and Linux. Requires Python 3.12+ and a terminal. Setup is guided - you just answer a few prompts.
 
 ## The problem
 
@@ -56,6 +56,26 @@ eufy-sync --install-agent   # set up automatic sync
 eufy-sync --uninstall-agent # remove automatic sync
 eufy-sync --uninstall       # remove all data and clean up
 ```
+
+## Linux and serverless runtime support
+
+- Linux is supported for normal CLI usage.
+- Automatic scheduling via `--install-agent` is macOS-only (Launch Agent). On Linux, schedule `eufy-sync --headless` using your platform scheduler (for example cron/systemd).
+- For container/serverless environments, use env-configurable paths:
+  - `EUFY_SYNC_DATA_DIR`
+  - `EUFY_SYNC_CONFIG`
+  - `EUFY_SYNC_DB`
+- First-time setup is interactive. For AWS Lambda/Azure Functions, pre-provision config/tokens and run headless.
+
+Programmatic serverless entrypoints are available:
+
+```python
+from eufy_sync.serverless import lambda_handler, azure_function_handler, run_sync_once
+```
+
+- `lambda_handler(event, context)` for AWS Lambda
+- `azure_function_handler(req)` for Azure Functions adapters
+- `run_sync_once(...)` for custom wrappers/jobs
 
 ## Updating
 
@@ -121,4 +141,3 @@ pytest tests/ -v
 ## Disclaimer
 
 Uses unofficial APIs for Eufy and Garmin, and the official Strava API. Could break if any of these companies change things. Use at your own risk.
-

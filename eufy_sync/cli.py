@@ -21,8 +21,10 @@ from pathlib import Path
 import yaml
 
 DATA_DIR = Path.home() / ".garmin-sync"
-DEFAULT_CONFIG = DATA_DIR / "config.yaml"
-DEFAULT_DB = DATA_DIR / "state.db"
+if os.environ.get("EUFY_SYNC_DATA_DIR"):
+    DATA_DIR = Path(os.environ["EUFY_SYNC_DATA_DIR"]).expanduser()
+DEFAULT_CONFIG = Path(os.environ.get("EUFY_SYNC_CONFIG", str(DATA_DIR / "config.yaml"))).expanduser()
+DEFAULT_DB = Path(os.environ.get("EUFY_SYNC_DB", str(DATA_DIR / "state.db"))).expanduser()
 LOG_FILE = DATA_DIR / "sync.log"
 LAUNCH_AGENT_LABEL = "com.sturimcode.eufy-garmin-sync"
 LAUNCH_AGENT_PATH = Path.home() / "Library" / "LaunchAgents" / f"{LAUNCH_AGENT_LABEL}.plist"
@@ -847,6 +849,10 @@ def main() -> None:
     # First-run setup if no config exists
     first_run = not config_path.exists()
     if first_run:
+        if not sys.stdin.isatty():
+            print("Error: No config found and setup requires an interactive terminal.")
+            print(f"Create config first (for example at: {config_path}) and rerun in headless mode.")
+            sys.exit(1)
         _first_run_setup(config_path)
     else:
         # Migrate existing plaintext passwords to keychain (one-time)

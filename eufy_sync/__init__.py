@@ -7,6 +7,7 @@ from eufy_sync.garmin_auth import GarminAuth
 from eufy_sync.eufy_client import EufyClient, EufyMeasurement
 from eufy_sync.fit import FitEncoder
 from eufy_sync.strava_client import StravaClient
+from eufy_sync.serverless import run_sync_once, lambda_handler, azure_function_handler
 from eufy_sync.transform import GarminBodyComposition, transform
 
 __all__ = [
@@ -17,4 +18,7 @@ __all__ = [
     "GarminBodyComposition",
     "StravaClient",
     "transform",
+    "run_sync_once",
+    "lambda_handler",
+    "azure_function_handler",
 ]
