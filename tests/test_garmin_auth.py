@@ -3,7 +3,13 @@ from __future__ import annotations
 import time
 from unittest.mock import patch, MagicMock
 
-from eufy_sync.garmin_auth import GarminAuth, GarminSession, TokenPair
+from eufy_sync.garmin_auth import (
+    GarminAuth,
+    GarminSession,
+    TokenPair,
+    _browser_context_options,
+    _launch_browser,
+)
 
 
 def _make_token(access_expires_in: float = 3600, refresh_expires_in: float = 86400 * 365) -> TokenPair:
@@ -63,3 +69,38 @@ def test_token_status_no_session():
 
     assert status["state"] == "no_session"
     assert status["days_remaining"] is None
+
+
+def test_browser_context_options_windows():
+    with patch("eufy_sync.garmin_auth.platform.system", return_value="Windows"):
+        assert _browser_context_options() == {}
+
+
+def test_browser_context_options_non_windows():
+    with patch("eufy_sync.garmin_auth.platform.system", return_value="Darwin"):
+        opts = _browser_context_options()
+    assert opts["is_mobile"] is True
+    assert "user_agent" in opts
+    assert "viewport" in opts
+
+
+def test_launch_browser_windows_edge_first_fallback_to_chromium():
+    playwright = MagicMock()
+    playwright.chromium.launch.side_effect = [RuntimeError("no edge"), "fallback-browser"]
+    with patch("eufy_sync.garmin_auth.platform.system", return_value="Windows"):
+        browser = _launch_browser(playwright)
+    assert browser == "fallback-browser"
+    assert playwright.chromium.launch.call_count == 2
+    first_call_kwargs = playwright.chromium.launch.call_args_list[0].kwargs
+    second_call_kwargs = playwright.chromium.launch.call_args_list[1].kwargs
+    assert first_call_kwargs == {"headless": False, "channel": "msedge"}
+    assert second_call_kwargs == {"headless": False}
+
+
+def test_launch_browser_non_windows_uses_default_chromium():
+    playwright = MagicMock()
+    playwright.chromium.launch.return_value = "browser"
+    with patch("eufy_sync.garmin_auth.platform.system", return_value="Darwin"):
+        browser = _launch_browser(playwright)
+    assert browser == "browser"
+    playwright.chromium.launch.assert_called_once_with(headless=False)

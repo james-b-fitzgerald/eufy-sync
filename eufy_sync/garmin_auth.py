@@ -17,6 +17,7 @@ import base64
 import json
 import logging
 import os
+import platform
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -50,6 +51,31 @@ API_HEADERS = {
 }
 
 REFRESH_SAFETY_MARGIN = 300  # seconds before expiry to trigger refresh
+
+
+def _launch_browser(playwright):
+    """Launch browser with Windows fallback for Cloudflare-sensitive SSO flows."""
+    if platform.system() == "Windows":
+        try:
+            return playwright.chromium.launch(headless=False, channel="msedge")
+        except Exception:
+            logger.info("Failed to launch Edge channel, falling back to bundled Chromium")
+    return playwright.chromium.launch(headless=False)
+
+
+def _browser_context_options() -> dict:
+    """Context options tuned for Garmin SSO reliability by platform."""
+    if platform.system() == "Windows":
+        return {}
+    return {
+        "user_agent": (
+            "Mozilla/5.0 (Linux; Android 13; sdk_gphone64_arm64)"
+            " AppleWebKit/537.36 (KHTML, like Gecko)"
+            " Chrome/121.0.0.0 Mobile Safari/537.36"
+        ),
+        "viewport": {"width": 412, "height": 915},
+        "is_mobile": True,
+    }
 
 
 @dataclass
@@ -108,16 +134,8 @@ def browser_login(email: str, password: str) -> str:
             logger.warning("Failed to parse login capture: %s", e)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
-        context = browser.new_context(
-            user_agent=(
-                "Mozilla/5.0 (Linux; Android 13; sdk_gphone64_arm64)"
-                " AppleWebKit/537.36 (KHTML, like Gecko)"
-                " Chrome/121.0.0.0 Mobile Safari/537.36"
-            ),
-            viewport={"width": 412, "height": 915},
-            is_mobile=True,
-        )
+        browser = _launch_browser(p)
+        context = browser.new_context(**_browser_context_options())
 
         # Expose a Python function to JS so we can capture the login response
         context.expose_binding(
