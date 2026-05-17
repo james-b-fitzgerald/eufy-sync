@@ -44,7 +44,7 @@ def run_sync_once(
             "Create it first or set EUFY_SYNC_CONFIG for your runtime."
         )
 
-    log_level = "DEBUG" if verbose else "WARNING"
+    log_level = "DEBUG" if verbose else "INFO"
     logging.basicConfig(
         level=getattr(logging, log_level),
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
