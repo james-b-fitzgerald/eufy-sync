@@ -23,11 +23,23 @@ This project gets around it with Playwright. On first run, a real Chromium windo
 
 You need Python 3.12+, a Eufy scale with cloud sync, and a Garmin Connect and/or Strava account.
 
-First, install pipx if you don't have it:
+Install `pipx` first (if needed):
+
+### macOS
 ```bash
 brew install pipx
 ```
-Or if you don't use Homebrew: `pip3 install pipx`
+Or without Homebrew:
+```bash
+python3 -m pip install --user pipx
+python3 -m pipx ensurepath
+```
+
+### Windows
+```powershell
+py -m pip install --user pipx
+py -m pipx ensurepath
+```
 
 Then install and run:
 ```bash
