@@ -72,8 +72,9 @@ def test_generate_plist_contains_binary_path():
 
 def test_generate_plist_contains_log_path():
     plist = _generate_plist("/any/path")
+    normalized_plist = plist.replace("\\", "/")
     expected = str(Path(".garmin-sync") / "sync.log").replace("\\", "/")
-    assert expected in plist.replace("\\", "/")
+    assert expected in normalized_plist
 
 
 @patch("eufy_sync.cli.subprocess.run")
