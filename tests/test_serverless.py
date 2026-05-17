@@ -75,8 +75,9 @@ def test_lambda_handler_failure(mock_run):
 def test_azure_function_handler_uses_request_json():
     from eufy_sync.serverless import azure_function_handler
 
-    with patch("eufy_sync.serverless.lambda_handler", return_value={"statusCode": 200, "body": '{"ok": true}'}):
+    with patch("eufy_sync.serverless.lambda_handler", return_value={"statusCode": 200, "body": '{"ok": true}'}) as mock_lambda:
         req = SimpleNamespace(get_json=lambda: {"dry_run": True})
         response = azure_function_handler(req)
+        mock_lambda.assert_called_once_with({"dry_run": True}, None)
         assert response["status_code"] == 200
         assert json.loads(response["body"]) == {"ok": True}

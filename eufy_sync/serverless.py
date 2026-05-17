@@ -78,8 +78,13 @@ def run_sync_once(
     finally:
         state.close()
 
+    users_total = len(config.users)
+    users_failed = len(failures)
     return {
-        "ok": len(failures) == 0,
+        "ok": users_failed == 0 and users_total > 0,
+        "partial": 0 < users_failed < users_total,
+        "users_total": users_total,
+        "users_failed": users_failed,
         "counts": total_counts,
         "total": sum(total_counts.values()),
         "failures": failures,

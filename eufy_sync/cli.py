@@ -851,7 +851,7 @@ def main() -> None:
     if first_run:
         if not sys.stdin.isatty():
             print("Error: No config found and setup requires an interactive terminal.")
-            print(f"Create config first (for example at: {config_path}) and rerun in headless mode.")
+            print(f"Create config first (for example at: {config_path}) then run with --headless.")
             sys.exit(1)
         _first_run_setup(config_path)
     else:

@@ -67,6 +67,11 @@ eufy-sync --uninstall       # remove all data and clean up
   - `EUFY_SYNC_DB`
 - First-time setup is interactive. For AWS Lambda/Azure Functions, pre-provision config/tokens and run headless.
 
+Pre-provision flow (once, outside serverless):
+1. Run `eufy-sync` interactively on your workstation to create config and complete Garmin/Strava auth.
+2. Deploy the resulting `config.yaml` and token/state files from `~/.garmin-sync/` to your runtime storage.
+3. Set `EUFY_SYNC_CONFIG` and `EUFY_SYNC_DB` in Lambda/Azure to those mounted paths.
+
 Programmatic serverless entrypoints are available:
 
 ```python
