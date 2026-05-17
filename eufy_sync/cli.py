@@ -522,7 +522,7 @@ def _uninstall_launch_agent() -> None:
             capture_output=True,
         )
         if result.returncode != 0:
-            print("No scheduled task installed")
+            print("No scheduled task installed.")
             return
         print("Scheduled task removed. Auto-sync disabled.")
         return

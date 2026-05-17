@@ -100,7 +100,7 @@ def test_install_launch_agent_skips_on_linux(mock_system, capsys):
 
 
 @patch("eufy_sync.cli.subprocess.run")
-@patch("eufy_sync.cli.shutil.which", return_value=r"C:\Users\user\AppData\Roaming\Python\Scripts\eufy-sync.exe")
+@patch("eufy_sync.cli.shutil.which", return_value=r"C:\Python\Scripts\eufy-sync.exe")
 @patch("eufy_sync.cli.platform.system", return_value="Windows")
 def test_install_launch_agent_windows_creates_scheduled_task(mock_system, mock_which, mock_run):
     _install_launch_agent()
@@ -159,7 +159,7 @@ def test_uninstall_launch_agent_windows_removes_task(mock_system, mock_run, caps
 def test_uninstall_launch_agent_windows_noop_if_not_installed(mock_system, mock_run, capsys):
     mock_run.return_value.returncode = 1
     _uninstall_launch_agent()
-    assert "No scheduled task installed" in capsys.readouterr().out
+    assert "No scheduled task installed." in capsys.readouterr().out
 
 
 @patch("eufy_sync.cli._install_launch_agent")
