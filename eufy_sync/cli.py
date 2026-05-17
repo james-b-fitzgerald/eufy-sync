@@ -26,6 +26,7 @@ DEFAULT_DB = DATA_DIR / "state.db"
 LOG_FILE = DATA_DIR / "sync.log"
 LAUNCH_AGENT_LABEL = "com.sturimcode.eufy-garmin-sync"
 LAUNCH_AGENT_PATH = Path.home() / "Library" / "LaunchAgents" / f"{LAUNCH_AGENT_LABEL}.plist"
+WINDOWS_TASK_NAME = "eufy-sync-auto"
 
 UPDATE_CHECK_INTERVAL = 604800  # check once per week
 
@@ -140,7 +141,7 @@ def _first_run_setup(config_path: Path) -> None:
     """Interactive setup wizard for first-time users."""
     print("")
     print("  eufy-sync - first time setup")
-    print("  Credentials are stored in your system keychain (macOS Keychain / Secret Service).")
+    print("  Credentials are stored in your system keychain (macOS Keychain / Windows Credential Manager / Secret Service).")
     print("")
 
     eufy_email = input("Eufy email: ").strip()
@@ -427,9 +428,10 @@ def _generate_plist(binary_path: str) -> str:
 
 
 def _install_launch_agent() -> None:
-    """Install the macOS Launch Agent for automatic sync."""
-    if platform.system() != "Darwin":
-        print("Auto-sync is only supported on macOS.")
+    """Install automatic sync (macOS Launch Agent / Windows Task Scheduler)."""
+    system = platform.system()
+    if system not in ("Darwin", "Windows"):
+        print("Auto-sync is only supported on macOS and Windows.")
         return
 
     binary = shutil.which("eufy-sync")
@@ -437,33 +439,55 @@ def _install_launch_agent() -> None:
         print("Warning: could not find eufy-sync on PATH. Skipping auto-sync setup.")
         return
 
-    already_installed = LAUNCH_AGENT_PATH.exists()
+    if system == "Darwin":
+        already_installed = LAUNCH_AGENT_PATH.exists()
 
-    # Ensure the log directory exists with restricted permissions
-    DATA_DIR.mkdir(parents=True, exist_ok=True, mode=0o700)
+        # Ensure the log directory exists with restricted permissions
+        DATA_DIR.mkdir(parents=True, exist_ok=True, mode=0o700)
 
-    LAUNCH_AGENT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    LAUNCH_AGENT_PATH.write_text(_generate_plist(binary))
+        LAUNCH_AGENT_PATH.parent.mkdir(parents=True, exist_ok=True)
+        LAUNCH_AGENT_PATH.write_text(_generate_plist(binary))
 
-    # Unload first in case an old version is loaded
+        # Unload first in case an old version is loaded
+        subprocess.run(
+            ["launchctl", "unload", str(LAUNCH_AGENT_PATH)],
+            capture_output=True,
+        )
+        subprocess.run(
+            ["launchctl", "load", str(LAUNCH_AGENT_PATH)],
+            capture_output=True,
+        )
+
+        if already_installed:
+            print(f"Launch Agent already installed (reloaded). Logs: {LOG_FILE}")
+        else:
+            print(f"Automatic sync installed. Logs: {LOG_FILE}")
+        return
+
+    # Windows: install/update per-user task every 4 hours
+    # schtasks expects /TR as a single command string, so quote the executable path.
     subprocess.run(
-        ["launchctl", "unload", str(LAUNCH_AGENT_PATH)],
+        [
+            "schtasks",
+            "/Create",
+            "/F",
+            "/SC",
+            "HOURLY",
+            "/MO",
+            "4",
+            "/TN",
+            WINDOWS_TASK_NAME,
+            "/TR",
+            f'"{binary}" --headless',
+        ],
         capture_output=True,
     )
-    subprocess.run(
-        ["launchctl", "load", str(LAUNCH_AGENT_PATH)],
-        capture_output=True,
-    )
-
-    if already_installed:
-        print(f"Launch Agent already installed (reloaded). Logs: {LOG_FILE}")
-    else:
-        print(f"Automatic sync installed. Logs: {LOG_FILE}")
+    print("Automatic sync installed (Windows Task Scheduler).")
 
 
 def _offer_launch_agent() -> None:
-    """Offer to install a macOS Launch Agent after first-run setup."""
-    if platform.system() != "Darwin":
+    """Offer to install auto-sync after first-run setup."""
+    if platform.system() not in ("Darwin", "Windows"):
         return
     if not sys.stdin.isatty():
         return
@@ -477,17 +501,33 @@ def _offer_launch_agent() -> None:
 
 
 def _uninstall_launch_agent() -> None:
-    """Remove the macOS Launch Agent."""
-    if not LAUNCH_AGENT_PATH.exists():
-        print("No Launch Agent installed.")
+    """Remove auto-sync (macOS Launch Agent / Windows Task Scheduler)."""
+    system = platform.system()
+    if system == "Darwin":
+        if not LAUNCH_AGENT_PATH.exists():
+            print("No Launch Agent installed.")
+            return
+
+        subprocess.run(
+            ["launchctl", "unload", str(LAUNCH_AGENT_PATH)],
+            capture_output=True,
+        )
+        LAUNCH_AGENT_PATH.unlink()
+        print("Launch Agent removed. Auto-sync disabled.")
         return
 
-    subprocess.run(
-        ["launchctl", "unload", str(LAUNCH_AGENT_PATH)],
-        capture_output=True,
-    )
-    LAUNCH_AGENT_PATH.unlink()
-    print("Launch Agent removed. Auto-sync disabled.")
+    if system == "Windows":
+        result = subprocess.run(
+            ["schtasks", "/Delete", "/TN", WINDOWS_TASK_NAME, "/F"],
+            capture_output=True,
+        )
+        if result.returncode != 0:
+            print("No scheduled task installed")
+            return
+        print("Scheduled task removed. Auto-sync disabled.")
+        return
+
+    print("Auto-sync is only supported on macOS and Windows.")
 
 
 def _uninstall(data_dir: Path) -> None:
@@ -517,10 +557,12 @@ def _uninstall(data_dir: Path) -> None:
         keep_answer = input("Keep sync history? Prevents duplicates if you reinstall later. [Y/n] ").strip()
         keep_db = not keep_answer.lower().startswith("n")
 
-    # Stop and remove Launch Agent
-    if LAUNCH_AGENT_PATH.exists():
+    # Stop and remove auto-sync task
+    if platform.system() == "Darwin" and LAUNCH_AGENT_PATH.exists():
         subprocess.run(["launchctl", "unload", str(LAUNCH_AGENT_PATH)], capture_output=True)
         LAUNCH_AGENT_PATH.unlink()
+    elif platform.system() == "Windows":
+        subprocess.run(["schtasks", "/Delete", "/TN", WINDOWS_TASK_NAME, "/F"], capture_output=True)
 
     # Clear keychain entries for every user named in the config
     user_names = ["default"]
@@ -802,11 +844,11 @@ def main() -> None:
                         help="Show recent sync history, last N entries (default: 14)")
     parser.add_argument("--backfill-days", type=int, default=None, help="Sync last N days")
     parser.add_argument("--dry-run", action="store_true", help="Preview without uploading")
-    parser.add_argument("--headless", action="store_true", help="No browser popups (for Launch Agent)")
+    parser.add_argument("--headless", action="store_true", help="No browser popups (for auto-sync jobs)")
     parser.add_argument("--verbose", "-v", action="store_true", help="Show detailed sync logs")
-    parser.add_argument("--install-agent", action="store_true", help="Set up automatic sync (macOS Launch Agent)")
-    parser.add_argument("--uninstall-agent", action="store_true", help="Remove the automatic sync Launch Agent")
-    parser.add_argument("--uninstall", action="store_true", help="Remove all data, tokens, and Launch Agent")
+    parser.add_argument("--install-agent", action="store_true", help="Set up automatic sync (macOS Launch Agent / Windows Task Scheduler)")
+    parser.add_argument("--uninstall-agent", action="store_true", help="Remove the automatic sync job")
+    parser.add_argument("--uninstall", action="store_true", help="Remove all data, tokens, and automatic sync job")
     parser.add_argument("--config", type=Path, default=None, help="Config path (default: ~/.garmin-sync/config.yaml)")
     parser.add_argument("--db", type=Path, default=None, help="Database path (default: ~/.garmin-sync/state.db)")
     args = parser.parse_args()

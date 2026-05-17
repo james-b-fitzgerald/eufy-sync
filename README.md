@@ -7,7 +7,7 @@
 
 Syncs body composition data from a Eufy smart scale to Garmin Connect and/or Strava. Weight, body fat %, muscle mass, bone mass, hydration, BMR, visceral fat, and metabolic age all come through to Garmin. Strava gets weight updates.
 
-> macOS only. Requires Python 3.12+ and a terminal. Setup is guided - you just answer a few prompts.
+> Supports macOS and Windows. Requires Python 3.12+ and a terminal. Setup is guided - you just answer a few prompts.
 
 ## The problem
 
@@ -65,11 +65,14 @@ The tool checks for updates weekly and will let you know when a new version is a
 pipx install --force eufy-sync
 ```
 
-## Automatic sync (macOS)
+## Automatic sync
 
-On first run, you'll be asked if you want to sync automatically every 4 hours. If you say yes, a macOS Launch Agent is installed that runs in the background - weigh yourself, open your laptop later, and it syncs on its own.
+On first run, you'll be asked if you want to sync automatically every 4 hours. If you say yes, eufy-sync installs a background job:
 
-Logs go to `~/.garmin-sync/sync.log`. You get a macOS notification if something fails.
+- macOS: Launch Agent
+- Windows: Task Scheduler task
+
+Logs go to `~/.garmin-sync/sync.log`. On macOS, you'll also get a notification if something fails.
 
 To disable: `eufy-sync --uninstall-agent`
 
@@ -104,7 +107,7 @@ Eufy Cloud API --> eufy_client.py --> transform.py     (FIT file + upload)
 
 ## Security
 
-Your passwords and OAuth tokens are stored in your system keychain (macOS Keychain) - not in plaintext files. Config files in `~/.garmin-sync/` only contain email addresses and Strava API app credentials, with `600` permissions. Credentials are only sent to Eufy, Garmin, and Strava's own servers over HTTPS. They are never logged, uploaded, or transmitted anywhere else. The only other outbound call is a weekly version check to `pypi.org` (no credentials sent). You can verify this yourself - the codebase is small and the outbound calls are in `eufy_client.py`, `garmin_auth.py`, `strava_client.py`, and the update checker in `cli.py`.
+Your passwords and OAuth tokens are stored in your system keychain (for example: macOS Keychain / Windows Credential Manager) - not in plaintext files. Config files in `~/.garmin-sync/` only contain email addresses and Strava API app credentials, with `600` permissions where supported. Credentials are only sent to Eufy, Garmin, and Strava's own servers over HTTPS. They are never logged, uploaded, or transmitted anywhere else. The only other outbound call is a weekly version check to `pypi.org` (no credentials sent). You can verify this yourself - the codebase is small and the outbound calls are in `eufy_client.py`, `garmin_auth.py`, `strava_client.py`, and the update checker in `cli.py`.
 
 On systems without keychain support (headless Linux), credentials fall back to file-based storage with `600` permissions.
 
@@ -121,4 +124,3 @@ pytest tests/ -v
 ## Disclaimer
 
 Uses unofficial APIs for Eufy and Garmin, and the official Strava API. Could break if any of these companies change things. Use at your own risk.
-

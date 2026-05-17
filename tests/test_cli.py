@@ -15,6 +15,7 @@ from eufy_sync.cli import (
     _offer_launch_agent,
     LAUNCH_AGENT_LABEL,
     LAUNCH_AGENT_PATH,
+    WINDOWS_TASK_NAME,
 )
 
 
@@ -95,7 +96,19 @@ def test_install_launch_agent_writes_plist_and_loads(mock_path, mock_system, moc
 @patch("eufy_sync.cli.platform.system", return_value="Linux")
 def test_install_launch_agent_skips_on_linux(mock_system, capsys):
     _install_launch_agent()
-    assert "only supported on macOS" in capsys.readouterr().out
+    assert "only supported on macOS and Windows" in capsys.readouterr().out
+
+
+@patch("eufy_sync.cli.subprocess.run")
+@patch("eufy_sync.cli.shutil.which", return_value=r"C:\Users\user\AppData\Roaming\Python\Scripts\eufy-sync.exe")
+@patch("eufy_sync.cli.platform.system", return_value="Windows")
+def test_install_launch_agent_windows_creates_scheduled_task(mock_system, mock_which, mock_run):
+    _install_launch_agent()
+    mock_run.assert_called_once()
+    cmd = mock_run.call_args[0][0]
+    assert cmd[0] == "schtasks"
+    assert "/Create" in cmd
+    assert WINDOWS_TASK_NAME in cmd
 
 
 @patch("eufy_sync.cli.shutil.which", return_value=None)
@@ -107,7 +120,8 @@ def test_install_launch_agent_warns_if_binary_not_found(mock_system, mock_which,
 
 @patch("eufy_sync.cli.subprocess.run")
 @patch("eufy_sync.cli.LAUNCH_AGENT_PATH")
-def test_uninstall_launch_agent_removes_plist(mock_path, mock_run):
+@patch("eufy_sync.cli.platform.system", return_value="Darwin")
+def test_uninstall_launch_agent_removes_plist(mock_system, mock_path, mock_run):
     mock_path.exists.return_value = True
     mock_path.unlink = MagicMock()
 
@@ -119,12 +133,33 @@ def test_uninstall_launch_agent_removes_plist(mock_path, mock_run):
 
 
 @patch("eufy_sync.cli.LAUNCH_AGENT_PATH")
-def test_uninstall_launch_agent_noop_if_not_installed(mock_path, capsys):
+@patch("eufy_sync.cli.platform.system", return_value="Darwin")
+def test_uninstall_launch_agent_noop_if_not_installed(mock_system, mock_path, capsys):
     mock_path.exists.return_value = False
 
     _uninstall_launch_agent()
 
     assert "No Launch Agent installed" in capsys.readouterr().out
+
+
+@patch("eufy_sync.cli.subprocess.run")
+@patch("eufy_sync.cli.platform.system", return_value="Windows")
+def test_uninstall_launch_agent_windows_removes_task(mock_system, mock_run, capsys):
+    mock_run.return_value.returncode = 0
+    _uninstall_launch_agent()
+    cmd = mock_run.call_args[0][0]
+    assert cmd[0] == "schtasks"
+    assert "/Delete" in cmd
+    assert WINDOWS_TASK_NAME in cmd
+    assert "Scheduled task removed" in capsys.readouterr().out
+
+
+@patch("eufy_sync.cli.subprocess.run")
+@patch("eufy_sync.cli.platform.system", return_value="Windows")
+def test_uninstall_launch_agent_windows_noop_if_not_installed(mock_system, mock_run, capsys):
+    mock_run.return_value.returncode = 1
+    _uninstall_launch_agent()
+    assert "No scheduled task installed" in capsys.readouterr().out
 
 
 @patch("eufy_sync.cli._install_launch_agent")
