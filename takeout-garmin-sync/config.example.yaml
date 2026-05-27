@@ -1,0 +1,20 @@
+# takeout-garmin-sync config
+# Save as ~/.takeout-garmin-sync/config.yaml
+#
+# Credentials can be supplied inline or as environment variables.
+# The ${VAR_NAME} syntax is expanded at runtime.
+#
+# For serverless / CI deployments, omit this file entirely and export:
+#   GARMIN_EMAIL, GARMIN_PASSWORD, GARMIN_SESSION_JSON
+
+garmin:
+  email: "${GARMIN_EMAIL}"
+  password: "${GARMIN_PASSWORD}"
+
+# Optional paths (defaults shown)
+# state_db: ~/.takeout-garmin-sync/state.db
+# session_path: ~/.takeout-garmin-sync/session.json
+
+# Optional weight validation bounds (kg)
+# min_weight_kg: 22.7    # ~50 lbs
+# max_weight_kg: 272.2   # ~600 lbs
