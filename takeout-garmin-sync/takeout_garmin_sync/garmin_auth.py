@@ -45,6 +45,10 @@ SSO_LOGIN_URL = (
     "&service=https://mobile.integration.garmin.com/gcm/android"
 )
 
+# Login polling: 180 seconds total (360 × 500 ms)
+_LOGIN_POLL_ITERATIONS = 360
+_LOGIN_POLL_INTERVAL_MS = 500
+
 API_HEADERS: dict[str, str] = {
     "user-agent": "GCM-Android-5.23",
     "x-garmin-client-platform": "Android",
@@ -305,10 +309,10 @@ def browser_login(email: str, password: str) -> str:
                 continue
 
         logger.info("Waiting for Garmin login (check the browser window for MFA prompts)…")
-        for _ in range(360):  # 3 minutes
+        for _ in range(_LOGIN_POLL_ITERATIONS):
             if captured_ticket:
                 break
-            page.wait_for_timeout(500)
+            page.wait_for_timeout(_LOGIN_POLL_INTERVAL_MS)
 
         browser.close()
 

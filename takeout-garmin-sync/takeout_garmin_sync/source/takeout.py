@@ -64,7 +64,7 @@ class WeightEntry:
         )
 
 
-def _parse_data_points(data: dict, filename: str = "") -> list[WeightEntry]:
+def _parse_data_points(data: dict, filename: str = "<unknown>") -> list[WeightEntry]:
     """Parse ``Data Points`` list from one Google Takeout JSON object."""
     entries: list[WeightEntry] = []
     for point in data.get("Data Points", []):

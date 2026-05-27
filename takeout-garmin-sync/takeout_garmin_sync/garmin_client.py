@@ -49,7 +49,9 @@ class GarminClient:
             self._http.headers["authorization"] = f"Bearer {token}"
             resp = self._http.request(method, url, **kwargs)
         if resp.status_code >= 400:
-            logger.error("Garmin API error %d: %s", resp.status_code, resp.text[:500])
+            # Truncate to avoid logging tokens or PII that may appear in error bodies
+            safe_body = resp.text[:200].encode("ascii", errors="replace").decode("ascii")
+            logger.error("Garmin API error %d: %s", resp.status_code, safe_body)
         resp.raise_for_status()
         return resp
 

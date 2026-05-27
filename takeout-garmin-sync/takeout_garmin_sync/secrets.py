@@ -102,6 +102,8 @@ def _store_session_to_file(data: dict, session_path: Path | None = None) -> None
     fd = os.open(str(path), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     with os.fdopen(fd, "w") as f:
         f.write(json.dumps(data, indent=2))
+    # Explicitly enforce 0600 in case the file pre-existed with looser permissions
+    os.chmod(str(path), 0o600)
     logger.info("Saved Garmin session to %s", path)
 
 

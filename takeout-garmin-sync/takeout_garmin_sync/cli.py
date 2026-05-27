@@ -45,7 +45,7 @@ def _configure_logging(verbose: bool) -> None:
     level = logging.DEBUG if verbose else logging.INFO
     logging.basicConfig(
         format="%(asctime)s %(levelname)-8s %(name)s — %(message)s",
-        datefmt="%Y-%m-%dT%H:%M:%S",
+        datefmt="%Y-%m-%dT%H:%M:%S%z",
         level=level,
         stream=sys.stderr,
     )

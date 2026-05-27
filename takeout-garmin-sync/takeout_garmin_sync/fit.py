@@ -54,9 +54,17 @@ def _fit_timestamp(dt: datetime) -> int:
 
     FIT timestamps are seconds since the FIT epoch (Dec 31, 1989 UTC).
     Timezone-aware datetimes use their actual UTC offset; naive datetimes
-    are treated as local time.
+    are treated as local time (a warning is emitted).
     """
-    unix_ts = int(dt.timestamp()) if dt.tzinfo else int(_time.mktime(dt.timetuple()))
+    if dt.tzinfo is None:
+        import logging
+        logging.getLogger(__name__).warning(
+            "Naive datetime passed to _fit_timestamp; treating as local time. "
+            "Pass a timezone-aware datetime to avoid incorrect FIT timestamps."
+        )
+        unix_ts = int(_time.mktime(dt.timetuple()))
+    else:
+        unix_ts = int(dt.timestamp())
     return unix_ts - FIT_EPOCH
 
 
